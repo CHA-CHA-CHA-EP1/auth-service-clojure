@@ -4,7 +4,10 @@
 
 (def LoginSchema
   [:map
-   [:email [:string {:min 3}]]
+   ;;[:email [:string {:min 3}]]
+   [:email [:and
+            [:string {:min 5 :max 100}]
+            [:re #".+@.+\..+"]]]                ;; ต้องเป็น email format
    [:password [:string {:min 8}]]])
 
 (defn login-handler
