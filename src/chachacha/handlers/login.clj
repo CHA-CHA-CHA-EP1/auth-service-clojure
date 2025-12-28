@@ -8,7 +8,7 @@
             #"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"]]
    [:password [:string {:min 8 :error/message "Password must be at least 8 characters"}]]])
 
-(defn- validate-login-request
+(defn validate-login-request
   [data]
   (if (m/validate login-schema data)
     {:valid? true :data data}
@@ -20,9 +20,11 @@
 (defn login-handler
   [request]
   (let [body (:body-params request)
-        email (:email body)
-        password (:password body)]
-    (println "email: " email " password:" password)
-    {:status 200
-     :body {:message "Login received"}}))
-
+        validation (validate-login-request body)]
+    (if (:valid? validation)
+      (let [{:keys [email password]} (:data validation)]
+        (println "email:" email "password:" password)
+        {:status 200
+         :body {:message "Login received"}})
+      {:status 400
+       :body {:errors (:errors validation)}})))
